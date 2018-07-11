@@ -1,5 +1,5 @@
 # cooperbot
-Voice recognition bot that helps out with bomb disposal (KTANE)
+Voice recognition bot that helps out with bomb disposal (KTANE) and various tasks
 
 ## Installation
 
