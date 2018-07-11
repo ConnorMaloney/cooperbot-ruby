@@ -1,5 +1,5 @@
 # cooperbot
-Voice recognition bot that helps out with various games
+Voice recognition bot that helps out with bomb disposal (KTANE)
 
 ## Installation
 
