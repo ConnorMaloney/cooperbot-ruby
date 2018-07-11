@@ -25,3 +25,9 @@ $ brew install --HEAD watsonbox/cmu-sphinx/cmu-pocketsphinx
 Next, install espeak.
 ```
 $ brew install espeak
+```
+
+You should now be able to launch Cooper.
+```
+$ ruby cooper.rb
+```
