@@ -1,9 +1,18 @@
 require 'pocketsphinx-ruby'
 require "espeak"
+require "espeak" #Necessary
 include ESpeak
 
+# require "require_all"
+
+# require relative specifies a file that is within your current directory
+require_relative "bomb"
+require_relative "logic/check" # this is how you link the logic folder with the rest of the program
+
+include Check
+
 # NOTE: This uses the built in mac os
-# system('say Hello World, My name is Cooper.')
+# system('say "Hello World, My name is Cooper" using rate 136 modulation 20 pitch 38')
 
 # NOTE: Tests cooper's voice
 # Speech.new("Calculating...", pitch: 60, capital: 40, speed: 180).speak
@@ -19,7 +28,7 @@ intro2 = ["Pleasure to make your acquaintance.", "At your service.", "Let's roll
 "Power at 100%. Ready.", "Let's not bugger this up.", "I'll do my best.", "We've got a job to do.",
 "Let's just get this over with.", "Let's rock and roll!"].sample
 
-# @bomb = Bomb.new
+@bomb = Bomb.new
 
 # TODO: Cooper listens for voice to select which module to disarm
 def select_module
@@ -31,24 +40,27 @@ def select_module
     case speech
     when "cooper bomb check"
       Speech.new("Check", pitch: 60, capital: 40, speed: 180).speak
+      Speech.new(Check.check_all(Pocketsphinx::Configuration::Grammar.new('grammars/check.gram'), @bomb), pitch: 60, capital: 40, speed: 180).speak
       return select_module
     
-    when "hey cooper"
-      Speech.new("Hello!", pitch: 60, capital: 40, speed: 180).speak
+    when "hey cooper", "hi cooper", "hi cooper how are you"
+      Speech.new("Hello there!", pitch: 60, capital: 40, speed: 180).speak
       return select_module
 
     when "how are you doing"
       Speech.new("I'm doing fine thanks, but we've got some important business to attend to so lets get to it!", pitch: 60, capital: 40, speed: 180).speak
       return select_module
 
-    # when "cooper we lost"
-      # Responses:  - Mission failed, we'll get em next time
-      #             - We must accept finite disappointment, but never lose infinite hope
-      #             - Its not my fault
-      #             - I blame you
-      #             - Blast. Shall we try again?
-      # Speech.new("I'm doing fine thanks, but we've got some important business to attend to so lets get to it!", pitch: 60, capital: 40, speed: 180).speak
-      # return select_module
+    when "thanks cooper", "thank you", "thanks"
+      Speech.new(["Always a pleasure", "No problem", "Happy to help!", ""].sample, pitch: 60, capital: 40, speed: 180).speak
+      return select_module
+
+    # On bomb failure/explosion  
+    when "cooper the bomb detonated", "cooper it detonated", "cooper the bomb blew up", "cooper it blew up", "cooper we lost"
+      Speech.new(["Mission failed, we'll get em next time", "We must accept finite disappointment, but never lose infinite hope", 
+      "Its not my fault", "I blame you", "Blast. Shall we try again?", "Nandato?", "That's impossible?",
+      "Snake? SNAKE? SNAAAAAAAAAAAAAAAAAAAAKE!"].sample, pitch: 60, capital: 40, speed: 180).speak
+      return select_module
     end
   end
 end
@@ -62,4 +74,5 @@ Speech.new(intro1, pitch: 60, capital: 40, speed: 180).speak
 
 puts intro2
 Speech.new(intro2, pitch: 60, capital: 40, speed: 180).speak
+# Speech.new(Check.check_all(Pocketsphinx::Configuration::Grammar.new('grammars/check.gram'), @bomb), pitch: 60, capital: 40, speed: 180).speak
 select_module
