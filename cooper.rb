@@ -3,13 +3,17 @@ require "espeak"
 require "espeak" #Necessary
 include ESpeak
 
-# require "require_all"
+# require "require_all"   # This seems to be a gem file, that would requiure all relatives?
 
 # require relative specifies a file that is within your current directory
 require_relative "bomb"
-require_relative "logic/check" # this is how you link the logic folder with the rest of the program
+require_relative "logic/check"
+require_relative "logic/wires" 
+
+# this is how you link the logic folder with the rest of the program
 
 include Check
+include Wires
 
 # NOTE: This uses the built in mac os
 # system('say "Hello World, My name is Cooper" using rate 136 modulation 20 pitch 38')
@@ -39,10 +43,15 @@ def select_module
   recognizer.recognize do |speech|
     case speech
     when "cooper bomb check"
-      Speech.new("Check", pitch: 60, capital: 40, speed: 180).speak
+      Speech.new("Checking bomb", pitch: 60, capital: 40, speed: 180).speak
       Speech.new(Check.check_all(Pocketsphinx::Configuration::Grammar.new('grammars/check.gram'), @bomb), pitch: 60, capital: 40, speed: 180).speak
       return select_module
     
+    when "defuse wires"
+      Speech.new("Defusing wires", pitch: 60, capital: 40, speed: 180).speak
+      Speech.new(Wires.defuse_wires(Pocketsphinx::Configuration::Grammar.new('grammars/wires.gram'), @bomb), pitch: 60, capital: 40, speed: 180).speak
+      return select_module
+
     when "hey cooper", "hi cooper", "hi cooper how are you"
       Speech.new("Hello there!", pitch: 60, capital: 40, speed: 180).speak
       return select_module

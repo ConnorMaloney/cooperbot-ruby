@@ -1,8 +1,11 @@
 module Check
     def check_all(configuration, bomb)
+
+      # numbers just assigns an array with each key being the word of a number, which gets mapped to a literal value.
+      # This seems to simply be for convenience
       numbers = {'one' => 1, 'two' => 2, 'three' => 3, 'four' => 4, 'five' => 5, 'six' => 6, 'seven' => 7, 'eight' => 8, 'nine' => 9, 'zero' => 0, }
-      Pocketsphinx::LiveSpeechRecognizer.new(configuration).recognize do |check|
-        10.times {puts check}
+      Pocketsphinx::LiveSpeechRecognizer.new(configuration).recognize do |check| # our speech variable is check
+        10.times {puts check} # Print out the check 10 times (So that it appears properly?)
         check = check.split(" ")
         case check[0]
         when "batteries"
