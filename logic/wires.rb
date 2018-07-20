@@ -1,51 +1,91 @@
 module Wires
     def defuse_wires(configuration, bomb) # configuration is what gets carried over from the speech file...
+        Pocketsphinx::LiveSpeechRecognizer.new(configuration).recognize do |wires|
 
-        #This is where cooper's logic will be to defuse the wires. 
-        #So, How to do this? The following are the rules:
-
-        # First...determine how many wires there are.
-
-        #Cooper asks you...or maybe you just tell Cooper? Him asking you might be a waste of time.
-
-        #First, tell Cooper how many wires there are. This can be from 3-6.
-
-        #Only ONE wire needs to be cut.
-
-        # SPEAK: "[colour1] wire [colour2] wire [colour3] wire [colour4] wire [colour5] wire [colour6] wire"
+           # wires = "red wire blue wire red wire"
 
 
-        # Store the colour of wires into an array, called COLOURS[].
+            # NOTE: So, can confirm that even though wires is NOT of type string, it behaves like one.
+            # 10.times { puts wires.upcase} # returns Pocketsphinx::Decoder::Hypothesis (10 times to visibly show it in output clutter to terminal)
 
-        # --- CASE 1: THREE WIRES ---
-        # If (colour1, colour2, and colour3 are NOT null, then we know theres only 3 wires)
-            # (If colour1, 2, or 3 is NOT red -> CUT SECOND WIRE)
-            # (Elif colour3 is WHITE -> CUT LAST WIRE)
-            # (Elif COLOURS array.count blue > 1 -> CUT LAST BLUE WIRE) #NOTE: This can be improved, I can have Cooper figure out the specific position of the wire
-            # (Else -> CUT LAST WIRE)
+            # If wires == "red wire blue wire", then...
+            colours = wires.split # This removes all whitespace, and gives us ["red", "wire", "blue", "wire"]
+            colours.delete("wire") # This will remove all "wire" instances from array, leaving us with just ["red", "blue"]
 
-        # --- CASE 2: FOUR WIRES ---
-        # If (colour1, colour2, colour3, and colour4 are NOT null, then we know theres only 4 wires)
-            # (If COLOURS array.count red > 1 AND bomb.LastSerialDigit is Odd -> CUT LAST RED WIRE) NOTE: This can be improved, I can have Cooper figure out the specific position of the wire#
-            # (Elif colour4 is YELLOW AND COLOURS array.count red == 0 -> CUT FIRST WIRE)
-            # (Elif COLOURS array.count blue == 1 -> CUT FIRST WIRE)
-            # (Elif COLOURS array.count yellow > 1 -> CUT LAST WIRE)
-            # (Else -> CUT SECOND WIRE)
+            
+            case colours
 
-        # --- CASE 3: FIVE WIRES ---
-        # If (colour1, colour2, colour3, colour4, and colour5 are NOT null, then we know theres only 5 wires)
-            # (If colour5 is BLACK AND the bomb.LastSerialDigit is Odd -> CUT FOURTH WIRE)
-            # (Elif COLOURS array.count red == 1 AND COLOURS array.count > 1 -> CUT FIRST WIRE)
-            # (Elif COLOURS array.count black == 0 -> CUT SECOND WIRE)
-            # (Else -> CUT FIRST WIRE)
-        
+            # --- CASE 1: THREE WIRES ---
+            # If there are no red wires, cut the second wire.
+            # Otherwise, if the last wire is white, cut the last wire.
+            # Otherwise, if there is more than one blue wire, cut the last blue wire. 
+            # Otherwise, cut the last wire.
+            when colours.size == 3
+                if colours.include?("red") == false 
+                    return Speech.new("CUT THE SECOND WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.last == "white"
+                    return Speech.new("CUT THE LAST WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.count("blue") > 1
+                    return Speech.new("CUT THE LAST BLUE WIRE", pitch: 60, capital: 40, speed: 180).speak
+                else
+                    return Speech.new("CUT THE LAST WIRE", pitch: 60, capital: 40, speed: 180).speak
+                end
+            
+            # --- CASE 2: FOUR WIRES ---
+            # If there is more than one red wire and the last digit of the serial number is odd, cut the last red wire.
+            # Otherwise, if the last wire is yellow and there are no red wires, cut the first wire.
+            # Otherwise, if there is exactly one blue wire, cut the first wire.
+            # Otherwise, if there is more than one yellow wire, cut the last wire. 
+            # Otherwise, cut the second wire.
+            when colours.size == 4
+                if colours.count("red") > 1 && bomb.serialOdd == true 
+                    return Speech.new("CUT THE LAST RED WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.last == "yellow" && colours.count("red") == 0
+                    return Speech.new("CUT THE FIRST WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.count("blue") == 1
+                    return Speech.new("CUT THE FIRST WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.count("yellow") > 1
+                    return Speech.new("CUT THE LAST WIRE", pitch: 60, capital: 40, speed: 180).speak
+                else
+                    return Speech.new("CUT THE SECOND WIRE", pitch: 60, capital: 40, speed: 180).speak
+                end
+            
+            # --- CASE 3: FIVE WIRES --- 
+            # If the last wire is black and the last digit of the serial number is odd, cut the fourth wire.
+            # Otherwise, if there is exactly one red wire and there is more than one yellow wire, cut the first wire.
+            # Otherwise, if there are no black wires, cut the second wire.
+            # Otherwise, cut the first wire.
+            when 5
+                if colours.last == "black" && bomb.serialOdd == true
+                    return Speech.new("CUT THE FOURTH WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.count("red") == 1 && colours.count("yellow") > 1
+                    return Speech.new("CUT THE FIRST WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.count("black") == 0
+                    return Speech.new("CUT THE SECOND WIRE", pitch: 60, capital: 40, speed: 180).speak
+                else 
+                    return Speech.new("CUT THE FIRST WIRE", pitch: 60, capital: 40, speed: 180).speak
+                end
 
-        # --- CASE 4: SIX WIRES ---
-        # If (all colours are NOT null, then we know theres 6 wires)
-            # (If COLOURS array.count yellow == 0 AND bomb.LastSerialDigit is Odd -> CUT THIRD WIRE)
-            # (Elif COLOURS array.count yellow == 1 AND COLOURS array.count white > 1 -> CUT FOURTH WIRE)
-            # (Elif COLOURS array.count red == 0 -> CUT LAST WIRE)
-            # (Else -> CUT FOURTH WIRE)
+            # --- CASE 4: SIX WIRES ---
+            # If there are no yellow wires and the last digit of the serial number is odd, cut the third wire.
+            # Otherwise, if there is exactly one yellow wire and there is more than one white wire, cut the fourth wire.
+            # Otherwise, if there are no red wires, cut the last wire.
+            # Otherwise, cut the fourth wire.
+            when 6
+                if colours.count("yellow") == 0 && bomb.serialOdd == true
+                    return Speech.new("CUT THE THIRD WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.count("yellow") == 1 && colours.count("white") > 1
+                    return Speech.new("CUT THE FOURTH WIRE", pitch: 60, capital: 40, speed: 180).speak
+                elsif colours.count("red") == 0
+                    return Speech.new("CUT THE LAST WIRE", pitch: 60, capital: 40, speed: 180).speak
+                else
+                    return Speech.new("CUT THE FOURTH WIRE", pitch: 60, capital: 40, speed: 180).speak
+                end 
+            
+            else 
+                return defuse_wires(configuration, bomb)
+            end 
+        end
     end
 end
 

@@ -84,4 +84,4 @@ Speech.new(intro1, pitch: 60, capital: 40, speed: 180).speak
 puts intro2
 Speech.new(intro2, pitch: 60, capital: 40, speed: 180).speak
 # Speech.new(Check.check_all(Pocketsphinx::Configuration::Grammar.new('grammars/check.gram'), @bomb), pitch: 60, capital: 40, speed: 180).speak
-select_module
+# select_module
